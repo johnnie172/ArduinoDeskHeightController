@@ -80,6 +80,8 @@ float measureDistanceCompensation(float speedOfSound) {
    
     duration = pulseIn(echoPin, HIGH);
     distance = duration*(speedOfSound/10000)/2;
+
+    distance = (floor((distance*2)+0.5)/2);
   return distance;
   }
 
@@ -87,14 +89,11 @@ int displayFloat(int tempDistance) {
   
   // Showing only if the distance is +- 0.5:
   if (tempDistanceLatest > tempDistance+5 || tempDistanceLatest < tempDistance-5) {
-        Serial.print("tempDistance = ");
-        Serial.println(tempDistance); 
         tempDistanceLatest = tempDistance;  
         display.showNumberDecEx(tempDistance,0b00100000 ,false,4,0);
   }
 }
 
-// NOT IN USE: ****
 int changeFloatTo4Digits(float distance, float delta) {
   float newDistance = distance+delta;
   int Distance4Digits = newDistance*10;
@@ -152,6 +151,9 @@ void setup() {
   Serial.println(memory2);
 
   speedOfSound = measureSpeedOfSound();
+  distance = measureDistanceCompensation(speedOfSound);
+  Serial.print("distance:");
+  Serial.println(distance);
 }
 
 
@@ -189,6 +191,8 @@ void loop() {
 
     if (digitalRead(buttonM1Pin) == HIGH){
       Serial.print("M1 Button");
+      Serial.print("memory1:");
+      Serial.println(memory1);
       delay(100);
       memory1int = changeFloatTo4Digits(memory1, delta);
       flash_screen(memory1int);
@@ -201,11 +205,13 @@ void loop() {
         Serial.println(distance);
         
         if (distance > memory1){
+          digitalWrite(UpPin, HIGH);
           digitalWrite(DownPin, LOW);
           Serial.print("Downpin state:");
           Serial.println(digitalRead(DownPin));
         }
         if (distance < memory1) {
+          digitalWrite(DownPin, HIGH);
           digitalWrite(UpPin, LOW);
           Serial.print("UpPin state:");
           Serial.println(digitalRead(UpPin)); 
@@ -216,6 +222,8 @@ void loop() {
     
     if (digitalRead(buttonM2Pin) == HIGH){
       Serial.print("M2 Button");
+      Serial.print("memory2:");
+      Serial.println(memory2);
       delay(100);
       memory2int = changeFloatTo4Digits(memory2, delta);
       flash_screen(memory2int);
@@ -228,11 +236,13 @@ void loop() {
         Serial.println(distance);
         
         if (distance > memory2){
+          digitalWrite(UpPin, HIGH);
           digitalWrite(DownPin, LOW);
           Serial.print("Downpin state:");
           Serial.println(digitalRead(DownPin));
         }
         if (distance < memory2) {
+          digitalWrite(DownPin, HIGH);
           digitalWrite(UpPin, LOW);
           Serial.print("UpPin state:");
           Serial.println(digitalRead(UpPin)); 
@@ -241,22 +251,22 @@ void loop() {
     }
     // Set M1 or M2 buttons to the current distance:
     if (digitalRead(buttonMemPin) == HIGH){
+        display.setBrightness(1, true);
         speedOfSound = measureSpeedOfSound();
         distance = measureDistanceCompensation(speedOfSound);
-
+        
         while (digitalRead(buttonM2Pin) == LOW && digitalRead(buttonM1Pin) == LOW){
             Serial.print("mem buttonn");
-
-            display.setBrightness(1, true);
-            display.showNumberDecEx(distance+delta,0,false,3,0);
             
             if (digitalRead(buttonM1Pin) == HIGH){
                 memory1 = distance;
                 Serial.print("memory1:");
                 Serial.println(memory1);
                 display.setBrightness(7, true);
-                flash_screen(memory1);
+                memory1int = changeFloatTo4Digits(memory1, delta);
+                flash_screen(memory1int);
                 display.clear();
+                display.setBrightness(7, true);
                 break;
 
             }
@@ -265,13 +275,16 @@ void loop() {
                 Serial.print("memory2:");
                 Serial.println(memory2);
                 display.setBrightness(7, true);
-                flash_screen(memory2);
+                memory2int = changeFloatTo4Digits(memory2, delta);
+                flash_screen(memory2int);
                 display.clear();
+                display.setBrightness(7, true);
                 break;
             }
             if (digitalRead(buttonUpPin) == HIGH || digitalRead(buttonDownPin) == HIGH){
-              display.setBrightness(7, true);
+              
               display.clear();
+              display.setBrightness(7, true);
               break;
             }
       }
