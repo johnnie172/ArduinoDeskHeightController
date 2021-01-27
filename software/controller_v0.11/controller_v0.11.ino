@@ -23,8 +23,12 @@ int delta = table_plate+distance_to_sensor;
 int memory1 = 41;
 int memory2 = 8;
 
-const int UpPin =  12;
-const int DownPin =  11;
+// Trying analog pins for relay control:
+
+const int UpPin =  A0;
+const int DownPin =  A1;
+//
+
 const int buttonUpPin = 6;
 int buttonUpState = 0;
 const int buttonDownPin = 7;
@@ -39,6 +43,12 @@ int buttonMem = 0;
 
 
 void setup() {
+
+  ///
+  // Trying analog pins for relay control:
+  pinMode(A0, OUTPUT);
+  pinMode(A1, OUTPUT);
+///
   
   digitalWrite(DownPin, HIGH);
   digitalWrite(UpPin, HIGH);
@@ -88,7 +98,6 @@ int flash_screen(int distance) {
             display.setBrightness(4, true); // Turn on
             display.showNumberDecEx(distance+delta,0,false,3,0);
             delay(100);
-            display.clear();
             }
 }
 
@@ -200,6 +209,11 @@ void loop() {
                 flash_screen(memory2);
                 display.clear();
                 break;
+            }
+            if (digitalRead(buttonUpPin) == HIGH || digitalRead(buttonDownPin) == HIGH){
+              display.setBrightness(7, true);
+              display.clear();
+              break;
             }
       }
   }
