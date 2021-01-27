@@ -32,11 +32,13 @@ float distance; // variable for the distance measurement
 float speedOfSound; //defining speed of sound it will store the calculated speed of sound
 
 int table_plate = 3;
-int distance_to_sensor = 69;
+int distance_to_sensor = 67;
 int delta = table_plate+distance_to_sensor;
+int tempDistanceLatest;
 
-int memory1 = 41;
-int memory2 = 8;
+
+float memory1 = 41.0;
+float memory2 = 8.0;
 
 // Trying analog pins for relay control:
 
@@ -79,6 +81,23 @@ float measureDistanceCompensation(float speedOfSound) {
   return distance;
   }
 
+int displayFloat(float distance,float delta) {
+  
+  // Converting float to int for the display to show:
+  float newDistance = distance+delta;
+  int tempDistance = newDistance*10;
+  
+  // Showing only if the distance is +- 0.3:
+  if (tempDistanceLatest > tempDistance+4 || tempDistanceLatest < tempDistance+4) {
+        Serial.println("tempDistance = ");
+        Serial.print(tempDistance);   
+        delay(300);
+        display.showNumberDecEx(tempDistance,0b00100000 ,false,4,0);
+        tempDistanceLatest = tempDistance;
+  }
+  
+}
+
 //Old distance measurment:
 
 //int measure_distance() {
@@ -92,7 +111,7 @@ float measureDistanceCompensation(float speedOfSound) {
 //    return distance;
 //}
 
-int flash_screen(int distance) {
+int flash_screen(float distance) {
 
             for(k = 0; k < 4; k++) {
             display.setBrightness(4, false);  // Turn off
@@ -264,7 +283,6 @@ void loop() {
   }
   
     
-    
-  display.showNumberDecEx(distance+delta,0,false,3,0);
-  
+  displayFloat(distance, delta);
+//  display.showNumberDecEx(distance+delta,0b00100000 ,false,3,0);
 }
