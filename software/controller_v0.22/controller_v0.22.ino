@@ -86,17 +86,26 @@ int displayFloat(float distance,float delta) {
   // Converting float to int for the display to show:
   float newDistance = distance+delta;
   int tempDistance = newDistance*10;
-  
+
+  //Change THIS: ****
   // Showing only if the distance is +- 0.5:
   if (tempDistanceLatest > tempDistance+5 || tempDistanceLatest < tempDistance+5) {
-        Serial.println("tempDistance = ");
-        Serial.print(tempDistance); 
+        Serial.print("tempDistance = ");
+        Serial.println(tempDistance); 
         tempDistanceLatest = tempDistance;  
         delay(300);
         display.showNumberDecEx(tempDistance,0b00100000 ,false,4,0);
   }
-  
 }
+git status
+// NOT IN USE: ****
+int changeFloatTo4Digits(float distance, float delta) {
+  float newDistance = distance+delta;
+  int Distance4Digits = newDistance*10;
+  return Distance4Digits;
+}
+  
+
 
 
 int flash_screen(float distance) {
