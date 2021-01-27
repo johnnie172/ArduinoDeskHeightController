@@ -35,10 +35,12 @@ int table_plate = 3;
 int distance_to_sensor = 67;
 int delta = table_plate+distance_to_sensor;
 int tempDistanceLatest;
-
+int tempDistance;
 
 float memory1 = 41.0;
 float memory2 = 8.0;
+int memory1int;
+int memory2int;
 
 // Trying analog pins for relay control:
 
@@ -81,23 +83,17 @@ float measureDistanceCompensation(float speedOfSound) {
   return distance;
   }
 
-int displayFloat(float distance,float delta) {
+int displayFloat(int tempDistance) {
   
-  // Converting float to int for the display to show:
-  float newDistance = distance+delta;
-  int tempDistance = newDistance*10;
-
-  //Change THIS: ****
   // Showing only if the distance is +- 0.5:
-  if (tempDistanceLatest > tempDistance+5 || tempDistanceLatest < tempDistance+5) {
+  if (tempDistanceLatest > tempDistance+5 || tempDistanceLatest < tempDistance-5) {
         Serial.print("tempDistance = ");
         Serial.println(tempDistance); 
         tempDistanceLatest = tempDistance;  
-        delay(300);
         display.showNumberDecEx(tempDistance,0b00100000 ,false,4,0);
   }
 }
-git status
+
 // NOT IN USE: ****
 int changeFloatTo4Digits(float distance, float delta) {
   float newDistance = distance+delta;
@@ -108,14 +104,14 @@ int changeFloatTo4Digits(float distance, float delta) {
 
 
 
-int flash_screen(float distance) {
+int flash_screen(int tempDistance) {
 
             for(k = 0; k < 4; k++) {
             display.setBrightness(4, false);  // Turn off
-            display.showNumberDecEx(distance+delta,0,false,3,0);
+            display.showNumberDecEx(tempDistance,0b00100000 ,false,4,0);
             delay(100);
             display.setBrightness(4, true); // Turn on
-            display.showNumberDecEx(distance+delta,0,false,3,0);
+            display.showNumberDecEx(tempDistance,0b00100000 ,false,4,0);
             delay(100);
             }
 }
@@ -194,7 +190,8 @@ void loop() {
     if (digitalRead(buttonM1Pin) == HIGH){
       Serial.print("M1 Button");
       delay(100);
-      flash_screen(memory1);
+      memory1int = changeFloatTo4Digits(memory1, delta);
+      flash_screen(memory1int);
       speedOfSound = measureSpeedOfSound();
       distance = measureDistanceCompensation(speedOfSound);
       
@@ -220,7 +217,8 @@ void loop() {
     if (digitalRead(buttonM2Pin) == HIGH){
       Serial.print("M2 Button");
       delay(100);
-      flash_screen(memory2);
+      memory2int = changeFloatTo4Digits(memory2, delta);
+      flash_screen(memory2int);
       speedOfSound = measureSpeedOfSound();
       distance = measureDistanceCompensation(speedOfSound);
       
@@ -279,7 +277,7 @@ void loop() {
       }
   }
   
-    
-  displayFloat(distance, delta);
+  tempDistance = changeFloatTo4Digits(distance, delta);
+  displayFloat(tempDistance);
 //  display.showNumberDecEx(distance+delta,0b00100000 ,false,3,0);
 }
